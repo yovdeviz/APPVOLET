@@ -1,0 +1,164 @@
+- id: '1682494736281'
+  alias: Scenario_HIVER_lever
+  description: ''
+  trigger: []
+  condition: []
+  action: []
+  mode: single
+- id: '1682494971870'
+  alias: Scenario_été_lever
+  description: Ouverture et fermeture des volets en pleine canicule
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.presence
+    for:
+      hours: 0
+      minutes: 10
+      seconds: 0
+    id: '2'
+  - platform: state
+    entity_id:
+    - input_datetime.debut_ete
+    attribute: month
+    from: Juin
+    to: Septembre
+    id: '3'
+  - platform: numeric_state
+    entity_id: sensor.temp_ext
+    below: 24
+    id: '4'
+  condition:
+  - condition: and
+    conditions:
+    - condition: trigger
+      id: '4'
+    - condition: trigger
+      id: '2'
+    - condition: trigger
+      id: '3'
+    - condition: or
+      conditions:
+      - condition: numeric_state
+        entity_id: number.position_battant_droit
+        below: 5
+      - condition: numeric_state
+        entity_id: number.position_battant_gauche
+        below: 5
+  action:
+  - service: number.set_value
+    data:
+      value: '100'
+    target:
+      entity_id: number.position_volet
+  mode: single
+- id: '1682498782288'
+  alias: Scénario_été_fermé
+  description: Fermeture du volet selon l'heure et la température en été
+  trigger:
+  - platform: numeric_state
+    entity_id: sensor.temp_ext
+    above: 24
+    id: '1'
+  condition:
+  - condition: and
+    conditions:
+    - condition: or
+      conditions:
+      - condition: numeric_state
+        entity_id: number.position_battant_droit
+        above: 0
+      - condition: numeric_state
+        entity_id: number.position_battant_gauche
+        above: 0
+    - condition: trigger
+      id: '1'
+  action:
+  - service: number.set_value
+    data:
+      value: '0'
+    target:
+      entity_id: number.position_volet
+  mode: single
+- id: '1682509972985'
+  alias: Activation_mode_vacances
+  description: Active le mode vacances
+  trigger:
+  - platform: state
+    entity_id:
+    - input_boolean.mode_vacances
+    from: 'off'
+    to: 'on'
+    id: '1'
+  condition:
+  - condition: trigger
+    id: '1'
+  action:
+  - parallel:
+    - service: script.ouverture_volet_vacances
+      data: {}
+    - service: script.fermeture_volets_vacances
+      data: {}
+  mode: single
+- id: '1682515164055'
+  alias: activation_mode_automatique
+  description: met home assistant en mode automatique pour qu'il ouvre et ferme les
+    volets automatiquement
+  trigger:
+  - platform: state
+    entity_id:
+    - input_boolean.mode_automatique
+    from: 'off'
+    to: 'on'
+    id: '1'
+  condition:
+  - condition: trigger
+    id: '1'
+  action:
+  - parallel:
+    - service: script.ouverture
+      data: {}
+    - service: script.fermeture
+      data: {}
+  mode: single
+- id: '1682517441804'
+  alias: Desactiation_mode_vacances
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - input_boolean.mode_vacances
+    from: 'on'
+    to: 'off'
+    id: '1'
+  condition:
+  - condition: trigger
+    id: '1'
+  action:
+  - if:
+    - condition: not
+      conditions:
+      - condition: state
+        entity_id: input_boolean.mode_vacances
+        state: 'off'
+    then:
+    - service: script.mode_neutre
+      data: {}
+  mode: single
+- id: '1682518456050'
+  alias: desactivation_mode_automatique
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - input_boolean.mode_automatique
+    from: 'on'
+    to: 'off'
+    id: '1'
+  condition:
+  - condition: trigger
+    id: '1'
+  action:
+  - service: script.mode_neutre
+    data: {}
+  mode: single
