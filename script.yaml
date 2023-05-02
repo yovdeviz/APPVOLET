@@ -1,0 +1,127 @@
+Fermeture_volet_vacances:
+  alias: Fermeture_volet_vacances
+  description: ferme les volets pour simuler une présence
+  sequence:
+  - condition: state
+    entity_id: sensor.presence
+    state: ''
+  mode: single
+  icon: mdi:blinds-horizontal-closed
+fermeture_volets_vacances:
+  alias: Fermeture_volets_vacances
+  sequence:
+  - parallel:
+    - if:
+      - condition: time
+        before: '21:00:00'
+        after: '19:00:00'
+      - condition: or
+        conditions:
+        - condition: numeric_state
+          entity_id: number.position_battant_droit
+          above: 0
+        - condition: numeric_state
+          entity_id: number.position_battant_gauche
+          above: 0
+      then:
+      - service: number.set_value
+        data:
+          value: '0'
+        target:
+          entity_id: number.position_volet
+  mode: single
+  icon: mdi:airplane-off
+ouverture_volet_vacances:
+  alias: ouverture_volet_vacances
+  sequence:
+  - if:
+    - condition: time
+      before: '19:00:00'
+      after: 07:00:00
+    - condition: or
+      conditions:
+      - condition: numeric_state
+        entity_id: number.position_battant_droit
+        below: 5
+      - condition: numeric_state
+        entity_id: number.position_battant_gauche
+        below: 5
+    then:
+    - service: number.set_value
+      data:
+        value: '100'
+      target:
+        entity_id: number.position_volet
+  mode: single
+  icon: mdi:airplane-takeoff
+ouverture:
+  alias: Ouverture
+  sequence:
+  - if:
+    - condition: or
+      conditions:
+      - condition: and
+        conditions:
+        - condition: or
+          conditions:
+          - condition: numeric_state
+            entity_id: number.position_battant_droit
+            below: 5
+          - condition: numeric_state
+            entity_id: number.position_battant_gauche
+            below: 5
+        - condition: time
+          before: '19:00:00'
+          after: 07:30:00
+      - condition: and
+        conditions:
+        - condition: or
+          conditions:
+          - condition: numeric_state
+            entity_id: number.position_battant_droit
+            below: 5
+          - condition: numeric_state
+            entity_id: number.position_battant_gauche
+            below: 5
+        - condition: numeric_state
+          entity_id: sensor.presence
+          above: 0
+    then:
+    - service: number.set_value
+      data:
+        value: '100'
+      target:
+        entity_id: number.position_volet
+  mode: single
+  icon: mdi:window-open-variant
+fermeture:
+  alias: Fermeture
+  sequence:
+  - if:
+    - condition: and
+      conditions:
+      - condition: time
+        after: '19:00:00'
+        before: '21:00:00'
+      - condition: or
+        conditions:
+        - condition: numeric_state
+          entity_id: number.position_battant_droit
+          above: 5
+        - condition: numeric_state
+          entity_id: number.position_battant_gauche
+          above: 5
+    then:
+    - service: number.set_value
+      data:
+        value: '0'
+      target:
+        entity_id: number.position_volet
+  mode: single
+  icon: mdi:window-closed
+mode_neutre:
+  alias: mode_neutre
+  sequence:
+  - if: []
+    then: []
+  mode: single
