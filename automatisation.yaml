@@ -162,3 +162,67 @@
   - service: script.mode_neutre
     data: {}
   mode: single
+- id: '1683028204637'
+  alias: Aperçu_Projet_Ouverture
+  description: Cette automatisation ouvrira le volet à une heure précise et la fermera
+    2 minutes plutard
+  trigger:
+  - platform: time
+    at: input_datetime.apercu_heure_ouverture
+    id: '2'
+  condition:
+  - condition: and
+    conditions:
+    - condition: trigger
+      id: '2'
+    - condition: state
+      entity_id: input_boolean.activer_la_routine_d_apercu
+      state: 'on'
+      for:
+        hours: 0
+        minutes: 0
+        seconds: 2
+  action:
+  - service: number.set_value
+    data:
+      value: '60'
+    target:
+      entity_id:
+      - number.position_volet
+      - number.position_battant_droit
+      - number.position_battant_gauche
+  mode: single
+- id: '1683028610575'
+  alias: Aperçu_volet_fermeture
+  description: ''
+  trigger:
+  - platform: time
+    at: input_datetime.apercu_heure_fermeture
+    id: '1'
+  condition:
+  - condition: or
+    conditions:
+    - condition: trigger
+      id: '1'
+    - condition: and
+      conditions:
+      - condition: or
+        conditions:
+        - condition: numeric_state
+          entity_id: number.position_battant_gauche
+          above: 0
+        - condition: and
+          conditions:
+          - condition: numeric_state
+            entity_id: number.position_battant_gauche
+            above: 0
+  action:
+  - service: number.set_value
+    data:
+      value: '0'
+    target:
+      entity_id:
+      - number.position_volet
+      - number.position_battant_droit
+      - number.position_battant_gauche
+  mode: single
