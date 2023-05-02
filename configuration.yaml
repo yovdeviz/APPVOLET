@@ -1,0 +1,124 @@
+# Loads default set of integrations. Do not remove.
+default_config:
+
+# Load frontend themes from the themes folder
+frontend:
+  themes: !include_dir_merge_named themes
+
+# Text to speech
+tts:
+  - platform: google_translate
+
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+
+input_boolean:
+  cover_automation:
+    name: Activer automatisation des volets
+    icon: mdi:window-shutter
+
+input_number:
+  cover_day_offset:
+    name: Minutes après le lever du soleil
+    icon: mdi:timer
+    min: -60
+    max: 60
+    step: 10
+  cover_night_offset:
+    name: Minutes après le coucher du soleil
+    icon: mdi:timer
+    min: -60
+    max: 60
+    step: 10
+
+sensor:
+  - platform: time_date
+    display_options:
+      - "time"
+      - "date"
+      - "date_time"
+      - "date_time_utc"
+      - "date_time_iso"
+      - "time_date"
+      - "time_utc"
+      - "beat"
+
+
+mqtt:
+  sensor:
+    #Capteurs de temperature
+    - name: "temp_int"
+      unique_id: "temp_int"
+      state_topic: "home/volet_salon/capteurs/temp/int"
+      unit_of_measurement: "°C"
+
+    - name: "temp_ext"
+      unique_id: "temp_ext"
+      state_topic: "home/volet_salon/capteurs/temp/ext"
+      unit_of_measurement: "°C"
+
+    #Capteur de luminosite
+    - name: "lum"
+      unique_id: "lum"
+      state_topic: "home/volet_salon/capteurs/lum/ext"
+      unit_of_measurement: "lux"
+
+    #Capteurs d'humidite
+    - name: "hum_int"
+      unique_id: "hum_int"
+      state_topic: "home/volet_salon/capteurs/hum/int"
+      unit_of_measurement: "%"
+    - name: "hum_ext"
+      unique_id: "hum_ext"
+      state_topic: "home/volet_salon/capteurs/hum/ext"
+      unit_of_measurement: "%"
+
+      #Capteur de presence
+    - name: "presence"
+      unique_id: "presence"
+      state_topic: "home/volet_salon/capteurs/mouv/int"
+
+    #Capteurs position
+    - name: "bat_gauche"
+      unique_id: "bat_gauche"
+      state_topic: "home/volet_salon/position/battant_gauche"
+      unit_of_measurement: "%"
+
+    - name: "bat_droit"
+      unique_id: "bat_droit"
+      state_topic: "home/volet_salon/position/battant_droit"
+      unit_of_measurement: "%"
+
+    #Deduction position
+    - name: "volet_status"
+      unique_id: "volet_status"
+      state_topic: "home/volet_salon/volet/status"
+
+  button:
+    - name: "calibration"
+      unique_id: "calibration"
+      command_topic: "home/volet_salon/commande/calibrate"
+
+    - name: "prise_origine"
+      unique_id: "prise_origine"
+      command_topic: "home/volet_salon/commande/origine"
+
+  number:
+    - name: "position battant gauche"
+      command_topic: "home/volet_salon/position/battant_gauche/set"
+      state_topic: "home/volet_salon/position/battant_gauche"
+      min: 0
+      max: 100
+
+    - name: "position battant droit"
+      command_topic: "home/volet_salon/position/battant_droit/set"
+      state_topic: "home/volet_salon/position/battant_droit"
+      min: 0
+      max: 100
+
+    - name: "position volet"
+      command_topic: "home/volet_salon/position/volet/set"
+      min: 0
+      max: 100
+
