@@ -45,6 +45,9 @@
       - condition: numeric_state
         entity_id: number.position_battant_gauche
         below: 5
+  - condition: state
+    entity_id: input_boolean.mode_ete
+    state: 'on'
   action:
   - service: number.set_value
     data:
@@ -73,6 +76,9 @@
         above: 0
     - condition: trigger
       id: '1'
+    - condition: state
+      entity_id: input_boolean.mode_ete
+      state: 'off'
   action:
   - service: number.set_value
     data:
@@ -223,6 +229,50 @@
     target:
       entity_id:
       - number.position_volet
+      - number.position_battant_droit
+      - number.position_battant_gauche
+  mode: single
+- id: '1683116040326'
+  alias: Mode_presence activé
+  description: lorsque le capteur détecte du mouvement et que le mode est activé,
+    le volet s'ouvre
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.presence
+    to: '1'
+  condition:
+  - condition: and
+    conditions:
+    - condition: state
+      entity_id: input_boolean.mode_presence
+      state: 'on'
+  action:
+  - service: number.set_value
+    data:
+      value: '60'
+    target:
+      entity_id:
+      - number.position_volet
+  mode: single
+- id: '1683116243898'
+  alias: Mode_presence  désactivé
+  description: On désactive le mode présence
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.presence
+    to: '0'
+  condition:
+  - condition: state
+    entity_id: input_boolean.mode_presence
+    state: 'on'
+  action:
+  - service: number.set_value
+    data:
+      value: '0'
+    target:
+      entity_id:
       - number.position_battant_droit
       - number.position_battant_gauche
   mode: single
